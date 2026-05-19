@@ -1,0 +1,34 @@
+# ==============================
+# Dossiers générés par colcon
+# ==============================
+# colcon build  → génère build/ et install/
+# colcon build  → génère log/ (logs de compilation)
+# Ces dossiers peuvent peser plusieurs Go — JAMAIS dans Git
+build/
+install/
+log/
+
+# ==============================
+# Fichiers ROS 2 temporaires
+# ==============================
+# Fichiers de carte générés par SLAM (on les versionne manuellement si besoin)
+*.pgm
+*.yaml.bak
+
+# Fichiers de bag ROS 2 (enregistrements capteurs — très lourds)
+*.db3
+*.mcap
+
+# ==============================
+# Python
+# ==============================
+__pycache__/
+*.py[cod]
+
+# ==============================
+# Modèles IA téléchargés
+# ==============================
+# Les poids YOLO peuvent peser 100Mo+ — on met juste le script de téléchargement
+*.pt
+*.weights
+*.onnx
