@@ -1,0 +1,33 @@
+# ============================================================
+# FILE        : sensor_params.yaml
+# MODULE      : sensor_interface (kit/)
+# DESCRIPTION : All configurable parameters for sensor nodes.
+#
+# REUSABILITY RULE:
+#     Swapping sensors on a new robot = editing only this file.
+#     No Python code changes needed.
+# ============================================================
+
+lidar_filter:
+  ros__parameters:
+    use_sim_time: true
+
+    # --- Input topic (raw data from hardware or Gazebo) ---
+    input_topic:  "/scan"
+
+    # --- Output topic (clean data for SLAM, Nav2, AI) ---
+    output_topic: "/sensors/lidar/filtered"
+
+    # --- Valid range window ---
+    min_range: 0.12    # meters — discard closer readings
+    max_range: 10.0    # meters — discard farther readings
+
+odom_filter:
+  ros__parameters:
+    use_sim_time: true
+
+    # --- Input topic (raw odometry from diff_drive plugin) ---
+    input_topic:  "/odom"
+
+    # --- Output topic (validated odometry for Nav2/SLAM) ---
+    output_topic: "/sensors/odom/filtered"
