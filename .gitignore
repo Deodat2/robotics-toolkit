@@ -32,3 +32,8 @@ __pycache__/
 *.pt
 *.weights
 *.onnx
+
+# Generated map files — environment-specific, not part of the kit
+*.pgm
+*.yaml.bak
+kit/slam_module/maps/*.yaml

@@ -1,0 +1,76 @@
+# ============================================================
+# FILE        : slam_params.yaml
+# MODULE      : slam_module (kit/)
+# DESCRIPTION : slam_toolbox configuration for AMR robot.
+#
+# REUSABILITY:
+#   Three environment presets are documented here:
+#   - Warehouse (current) : large open space, long corridors
+#   - Office              : many small rooms, narrow doors
+#   - Outdoor             : larger ranges, more noise
+#   Switch presets by changing the marked values.
+# ============================================================
+
+slam_toolbox:
+  ros__parameters:
+
+    # --- Mode ---
+    # "mapping"      : build a new map (use when exploring)
+    # "localization" : navigate on an existing saved map
+    mode: mapping
+
+    # --- Solver (math engine for scan matching) ---
+    # solver_plugin: solver_plugins::CeresSolver  ← more accurate
+    solver_plugin: solver_plugins::CeresSolver
+    ceres_linear_solver: SPARSE_NORMAL_CHOLESKY
+    ceres_preconditioner: SCHUR_JACOBI
+    ceres_trust_strategy: LEVENBERG_MARQUARDT
+    ceres_dogleg_type: TRADITIONAL_DOGLEG
+    ceres_loss_function: None
+
+    # --- ROS 2 topics and frames ---
+    # These must match sensor_interface output topics
+    odom_frame:    odom
+    map_frame:     map
+    base_frame:    base_footprint
+    scan_topic:    /sensors/lidar/filtered   # ← from sensor_interface
+    use_sim_time:  true
+
+    # --- Map parameters ---
+    map_update_interval:  2.0    # seconds between map updates
+                                 # lower = more CPU, more reactive
+    resolution:           0.05   # meters per pixel (5cm resolution)
+                                 # warehouse: 0.05 | office: 0.03
+
+    # --- Scan matching thresholds ---
+    # Robot must move this much before updating the map
+    # Too low  = too many updates = slow CPU
+    # Too high = map misses details
+    minimum_travel_distance:  0.2    # meters
+    minimum_travel_heading:   0.17   # radians (~10 degrees)
+
+    # --- Loop closure (detects when robot revisits a place) ---
+    # This corrects accumulated drift over time
+    do_loop_closing: true
+    loop_search_maximum_distance: 3.0   # meters — search radius
+    loop_match_minimum_response_coarse: 0.35
+    loop_match_minimum_response_fine:   0.45
+
+    # --- Scan matching range ---
+    # How far the algorithm looks for matching features
+    # warehouse: larger values (open space)
+    # office: smaller values (many walls = easier matching)
+    max_laser_range:          10.0    # must match LiDAR max_range
+    minimum_time_interval:     0.5    # seconds between scans processed
+
+    # --- Map saving ---
+    # When you call the save_map service, map goes here
+    map_file_name: /home/kossi/robotics/robotics-toolkit/kit/slam_module/maps/warehouse_map
+    map_start_pose: [0.0, 0.0, 0.0]   # [x, y, yaw] — robot start position
+
+    # --- Debug ---
+    debug_logging:   false
+    throttle_scans:  1       # process every Nth scan (1 = all scans)
+    transform_publish_period: 0.02   # seconds (50 Hz TF publishing)
+    transform_timeout:        0.2
+    tf_buffer_duration:      30.0
