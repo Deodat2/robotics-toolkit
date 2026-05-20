@@ -1,0 +1,38 @@
+# ============================================================
+# FILE        : robot_params.yaml
+# MODULE      : robot_base (kit/)
+# DESCRIPTION : All configurable parameters for the AMR robot.
+#
+# REUSABILITY RULE:
+#     When reusing robot_base in another project, only edit
+#     this file. Never hardcode values in Python nodes.
+# ============================================================
+
+robot_state_publisher:
+  ros__parameters:
+    use_sim_time: true             # Use Gazebo clock (not wall clock)
+
+base_controller:
+  ros__parameters:
+
+    # --- Robot identity ---
+    robot_name: "amr_001"          # Unique name (important for multi-robot)
+    robot_frame: "base_footprint"  # Root TF frame (ROS navigation convention)
+
+    # --- Velocity limits ---
+    max_linear_velocity:  0.5      # m/s  — max forward/backward speed
+    max_angular_velocity: 1.0      # rad/s — max rotation speed
+
+    # --- Wheel geometry (must match URDF values) ---
+    wheel_radius:     0.05         # meters
+    wheel_separation: 0.34         # meters — distance between left/right wheels
+
+    # --- ROS 2 topic names ---
+    # These can be remapped in the launch file without touching this file
+    cmd_vel_topic: "/cmd_vel"      # IN  — velocity command
+    odom_topic:    "/odom"         # OUT — wheel odometry
+    scan_topic:    "/scan"         # OUT — LiDAR data
+
+    # --- Publishing rates ---
+    odom_publish_rate:   50.0      # Hz — odometry update frequency
+    status_publish_rate:  1.0      # Hz — robot status heartbeat
