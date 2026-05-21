@@ -1,0 +1,286 @@
+# ============================================================
+# FILE        : nav2_params.yaml
+# MODULE      : nav2_config (kit/)
+# DESCRIPTION : Complete Nav2 stack configuration.
+#
+# REUSABILITY:
+#   Three sections to tune for a new robot:
+#   1. robot_radius        — physical size of your robot
+#   2. max_vel_x/theta     — speed limits (match robot_base)
+#   3. scan_topic          — must match sensor_interface output
+# ============================================================
+
+# ============================================================
+# AMCL — Adaptive Monte Carlo Localization
+# Estimates robot position on a known map using particles.
+# More particles = more accurate but more CPU.
+# ============================================================
+amcl:
+  ros__parameters:
+    use_sim_time: true
+
+    # --- Particle filter settings ---
+    min_particles:     500     # minimum number of particles
+    max_particles:    2000     # maximum number of particles
+    alpha1:           0.2      # rotation noise from rotation
+    alpha2:           0.2      # rotation noise from translation
+    alpha3:           0.2      # translation noise from translation
+    alpha4:           0.2      # translation noise from rotation
+    alpha5:           0.2      # translation noise from strafe
+
+    # --- Sensor model ---
+    laser_model_type:      likelihood_field
+    laser_max_range:       10.0   # must match LiDAR config
+    laser_min_range:       0.12
+    laser_likelihood_max_dist: 2.0
+    max_beams:             60     # beams used per update (speed/accuracy)
+
+    # --- Topics and frames ---
+    scan_topic:    /sensors/lidar/filtered   # from sensor_interface
+    base_frame_id: base_footprint
+    odom_frame_id: odom
+    global_frame_id: map
+
+    # --- Update thresholds ---
+    # Only update particles when robot has moved enough
+    update_min_d:  0.25    # meters
+    update_min_a:  0.2     # radians
+
+    # --- Recovery ---
+    recovery_alpha_slow: 0.001
+    recovery_alpha_fast: 0.1
+
+    # --- Initial pose (robot starts at map origin) ---
+    set_initial_pose: true
+    initial_pose:
+      x: 0.0
+      y: 0.0
+      z: 0.0
+      yaw: 0.0
+
+# ============================================================
+# PLANNER SERVER — Global Path Planning
+# Computes the optimal path from current pos to goal.
+# Uses NavFn (Dijkstra-based) algorithm.
+# ============================================================
+planner_server:
+  ros__parameters:
+    use_sim_time: true
+    expected_planner_frequency: 20.0
+
+    planner_plugins: ["GridBased"]
+    GridBased:
+      plugin: "nav2_navfn_planner/NavfnPlanner"
+      tolerance:     0.5      # meters — how close to goal is "arrived"
+      use_astar:     true     # true=A* (faster), false=Dijkstra (safer)
+      allow_unknown: true     # allow planning through unknown space
+
+# ============================================================
+# CONTROLLER SERVER — Local Path Following
+# Follows the global path while avoiding dynamic obstacles.
+# Uses DWB (Dynamic Window Approach Based) controller.
+# ============================================================
+controller_server:
+  ros__parameters:
+    use_sim_time: true
+    controller_frequency: 20.0   # Hz — how often to compute cmd_vel
+
+    # --- Topics ---
+    # odom_topic must match sensor_interface output
+    odom_topic: /sensors/odom/filtered
+
+    controller_plugins: ["FollowPath"]
+    FollowPath:
+      plugin: "dwb_core::DWBLocalPlanner"
+
+      # --- Velocity limits (must match robot_base config) ---
+      min_vel_x:    0.0      # m/s — no backwards movement
+      max_vel_x:    0.5      # m/s — max forward speed
+      min_vel_theta: -1.0    # rad/s
+      max_vel_theta:  1.0    # rad/s
+      min_speed_xy:  0.0
+      max_speed_xy:  0.5
+
+      # --- Acceleration limits ---
+      acc_lim_x:     2.5     # m/s²
+      acc_lim_theta: 3.2     # rad/s²
+      decel_lim_x:  -2.5
+      decel_lim_theta: -3.2
+
+      # --- Goal tolerance ---
+      xy_goal_tolerance:    0.25   # meters — arrived when this close
+      yaw_goal_tolerance:   0.25   # radians
+
+      # --- DWB critics (scoring functions for trajectory selection) ---
+      critics: ["RotateToGoal", "Oscillation", "BaseObstacle",
+                "GoalAlign", "PathAlign", "PathDist", "GoalDist"]
+      BaseObstacle.scale:  0.02
+      PathAlign.scale:     32.0
+      PathAlign.forward_point_distance: 0.1
+      GoalAlign.scale:     24.0
+      GoalAlign.forward_point_distance: 0.1
+      PathDist.scale:      32.0
+      GoalDist.scale:      24.0
+      RotateToGoal.scale:  32.0
+      RotateToGoal.slowing_factor: 5.0
+      RotateToGoal.lookahead_time: -1.0
+
+# ============================================================
+# BEHAVIOR SERVER — Recovery behaviors
+# What to do when the robot gets stuck.
+# ============================================================
+behavior_server:
+  ros__parameters:
+    use_sim_time: true
+    costmap_topic: local_costmap/costmap_raw
+    footprint_topic: local_costmap/published_footprint
+    cycle_frequency: 10.0
+    behavior_plugins: ["spin", "backup", "wait"]
+    spin:
+      plugin: "nav2_behaviors/Spin"
+    backup:
+      plugin: "nav2_behaviors/BackUp"
+    wait:
+      plugin: "nav2_behaviors/Wait"
+    global_frame: odom
+    robot_base_frame: base_footprint
+    transform_tolerance: 0.1
+    simulate_ahead_time: 2.0
+    max_rotational_vel:  1.0
+    min_rotational_vel:  0.4
+    rotational_acc_lim:  3.2
+
+# ============================================================
+# BT NAVIGATOR — Behavior Tree orchestrator
+# Coordinates all Nav2 components using a behavior tree.
+# ============================================================
+bt_navigator:
+  ros__parameters:
+    use_sim_time: true
+    global_frame: map
+    robot_base_frame: base_footprint
+    odom_topic: /sensors/odom/filtered
+    bt_loop_duration: 10        # ms
+    default_server_timeout: 20  # seconds
+    navigators: ["navigate_to_pose", "navigate_through_poses"]
+    navigate_to_pose:
+      plugin: "nav2_bt_navigator/NavigateToPoseNavigator"
+    navigate_through_poses:
+      plugin: "nav2_bt_navigator/NavigateThroughPosesNavigator"
+
+# ============================================================
+# COSTMAPS — Obstacle representation
+# Two costmaps: global (full map) and local (nearby area).
+# ============================================================
+
+# Global costmap — used by the planner for full path planning
+global_costmap:
+  global_costmap:
+    ros__parameters:
+      use_sim_time: true
+      global_frame: map
+      robot_base_frame: base_footprint
+      update_frequency:   1.0   # Hz
+      publish_frequency:  1.0   # Hz
+      resolution:         0.05  # must match slam resolution
+
+      # Robot footprint — approximate as circle for simplicity
+      robot_radius: 0.22        # meters — set to your robot's half-width
+
+      # Plugins: which layers to include in the costmap
+      plugins: ["static_layer", "obstacle_layer", "inflation_layer"]
+
+      static_layer:
+        plugin: "nav2_costmap_2d::StaticLayer"
+        map_subscribe_transient_local: true
+        enabled: true
+
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+        observation_sources: scan
+        scan:
+          topic: /sensors/lidar/filtered
+          max_obstacle_height: 2.0
+          clearing: true
+          marking: true
+          data_type: LaserScan
+          raytrace_max_range: 3.0
+          raytrace_min_range: 0.0
+          obstacle_max_range: 2.5
+          obstacle_min_range: 0.0
+
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 3.0
+        inflation_radius: 0.55  # meters — keep robot away from walls
+
+# Local costmap — used by the controller for immediate obstacle avoidance
+local_costmap:
+  local_costmap:
+    ros__parameters:
+      use_sim_time: true
+
+      # odom frame = costmap follows the robot automatically
+      # This is the correct frame for local costmap
+      global_frame: odom
+      robot_base_frame: base_footprint
+
+      update_frequency:  5.0
+      publish_frequency: 2.0
+      resolution:        0.05
+
+      # Rolling window = costmap FOLLOWS the robot
+      # This fixes "robot out of bounds" permanently
+      rolling_window: true
+      width:  4      # meters centered on robot
+      height: 4      # meters centered on robot
+
+      robot_radius: 0.22
+
+      plugins: ["obstacle_layer", "inflation_layer"]
+
+      obstacle_layer:
+        plugin: "nav2_costmap_2d::ObstacleLayer"
+        enabled: true
+        observation_sources: scan
+        scan:
+          topic: /sensors/lidar/filtered
+          max_obstacle_height: 2.0
+          clearing: true
+          marking: true
+          data_type: LaserScan
+          raytrace_max_range: 3.0
+          raytrace_min_range: 0.0
+          obstacle_max_range: 2.5
+          obstacle_min_range: 0.0
+
+      inflation_layer:
+        plugin: "nav2_costmap_2d::InflationLayer"
+        cost_scaling_factor: 3.0
+        inflation_radius: 0.55
+
+# ============================================================
+# MAP SERVER — Serves a saved map for localization mode
+# ============================================================
+map_server:
+  ros__parameters:
+    use_sim_time: true
+    yaml_filename: ""   # set at launch time via argument
+
+# ============================================================
+# LIFECYCLE MANAGER
+# Nav2 nodes are lifecycle nodes — they must be activated
+# in the right order. This manager handles that automatically.
+# ============================================================
+lifecycle_manager:
+  ros__parameters:
+    use_sim_time: true
+    autostart: true
+    node_names:
+      - map_server
+      - amcl
+      - planner_server
+      - controller_server
+      - behavior_server
+      - bt_navigator
