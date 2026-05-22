@@ -38,3 +38,4 @@ __pycache__/
 *.yaml.bak
 kit/slam_module/maps/*.yaml
 venv_vision/
+kit/object_detector/models/*.pt

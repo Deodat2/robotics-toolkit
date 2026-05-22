@@ -1,0 +1,34 @@
+# ============================================================
+# FILE        : detector_params.yaml
+# MODULE      : object_detector (kit/)
+# DESCRIPTION : YOLOv8 detection configuration.
+#
+# REUSABILITY:
+#   Change model_name to use a different YOLO variant or
+#   a custom-trained model placed in models/ directory.
+# ============================================================
+
+yolo_detector:
+  ros__parameters:
+
+    # --- Input topic (from vision_bridge) ---
+    input_topic: "/vision/image_preprocessed"
+
+    # --- YOLO model ---
+    # Options: yolov8n.pt | yolov8s.pt | yolov8m.pt | yolov8l.pt
+    # Custom: place .pt file in models/ and set name here
+    model_name: "yolov8n.pt"      # nano = fastest, best for simulation
+
+    # --- Detection thresholds ---
+    confidence_threshold: 0.5     # min confidence to report detection
+    iou_threshold:        0.45    # overlap threshold for NMS
+    max_detections:       20      # max objects per frame
+
+    # --- Performance ---
+    # Process every Nth frame to reduce CPU load
+    # 1 = all frames, 3 = every 3rd frame (~10 FPS at 30 FPS camera)
+    process_every_n: 3
+
+    # --- Debug ---
+    publish_debug: true           # publish annotated image
+    status_rate:   1.0            # Hz
