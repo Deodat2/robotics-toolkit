@@ -1,0 +1,17 @@
+# ============================================================
+# Vision AI dependencies
+# Install in a venv created with --system-site-packages
+# to maintain ROS 2 compatibility.
+#
+# Setup:
+#   python3 -m venv venv_vision --system-site-packages
+#   source venv_vision/bin/activate
+#   pip install -r requirements_vision.txt
+#
+# NOTE: numpy<2.0 is required for ultralytics + matplotlib
+# compatibility on Ubuntu 22.04 with system Python packages.
+# ============================================================
+
+numpy<2.0              # must stay <2.0 — matplotlib compatibility
+pyzbar==0.1.9          # QR code detection
+ultralytics==8.4.52    # YOLOv8 object detection

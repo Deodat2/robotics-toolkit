@@ -37,3 +37,4 @@ __pycache__/
 *.pgm
 *.yaml.bak
 kit/slam_module/maps/*.yaml
+venv_vision/
