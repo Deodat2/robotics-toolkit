@@ -1,0 +1,36 @@
+# ============================================================
+# FILE        : qr_params.yaml
+# MODULE      : qr_navigator (kit/)
+# DESCRIPTION : QR detection and waypoint configuration.
+#
+# REUSABILITY:
+#   Define your QR codes and their associated waypoints here.
+#   No code changes needed for new environments.
+# ============================================================
+
+qr_detector:
+  ros__parameters:
+
+    # --- Input topic (from vision_bridge) ---
+    input_topic: "/vision/image_preprocessed"
+
+    # --- QR physical size (meters) ---
+    # Measure the actual printed QR code size
+    # Used for distance estimation
+    qr_real_size_m: 0.15       # 15cm QR codes
+
+    # --- Camera focal length (pixels) ---
+    # For Gazebo camera with 60° FOV and 640px width:
+    # focal = (width/2) / tan(FOV/2) = 320/tan(30°) ≈ 554
+    focal_length_px: 554.0
+
+    # --- Detection settings ---
+    min_confidence: 0.5
+    publish_debug: true        # publish annotated frames
+    status_rate: 1.0           # Hz
+
+waypoint_manager:
+  ros__parameters:
+    # Cooldown between triggering same QR waypoint (seconds)
+    # Prevents robot from re-triggering same goal repeatedly
+    cooldown_seconds: 3.0

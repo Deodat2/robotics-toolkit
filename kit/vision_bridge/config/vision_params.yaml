@@ -1,0 +1,26 @@
+# ============================================================
+# FILE        : vision_params.yaml
+# MODULE      : vision_bridge (kit/)
+# DESCRIPTION : Camera and vision pipeline configuration.
+#
+# REUSABILITY:
+#   Change input_topic to match your robot's camera topic.
+#   Works with Gazebo camera plugin, RealSense, USB cameras.
+# ============================================================
+
+camera_node:
+  ros__parameters:
+
+    # --- Input topic (from Gazebo plugin or real camera) ---
+    input_topic: "/camera/image_raw"
+
+    # --- Output resolution ---
+    # All vision modules receive frames at this resolution
+    output_width:  640
+    output_height: 480
+
+    # --- Debug visualization ---
+    publish_debug: true     # publish annotated frames
+
+    # --- Status publishing rate ---
+    status_rate: 1.0        # Hz
