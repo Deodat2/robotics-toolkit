@@ -16,7 +16,7 @@ STANDALONE:
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument
+from launch.actions import DeclareLaunchArgument, ExecuteProcess
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -26,20 +26,25 @@ def generate_launch_description():
     pkg = get_package_share_directory('object_detector')
     params_file = os.path.join(pkg, 'config', 'detector_params.yaml')
 
+    # Use the venv Python explicitly for YOLO
+    # This ensures ultralytics and numpy<2.0 are available
+    venv_python = os.path.expanduser(
+        '~/robotics/robotics-toolkit/venv_vision/bin/python3'
+    )
+
     use_sim_time_arg = DeclareLaunchArgument(
         'use_sim_time', default_value='true',
         description='Use Gazebo clock'
     )
 
-    yolo_node = Node(
-        package='object_detector',
-        executable='yolo_detector',
-        name='yolo_detector',
+    yolo_node = ExecuteProcess(
+        cmd=[
+            venv_python, '-m', 'object_detector.yolo_detector',
+            '--ros-args',
+            '--params-file', params_file,
+            '-p', ['use_sim_time:=', LaunchConfiguration('use_sim_time')]
+        ],
         output='screen',
-        parameters=[
-            params_file,
-            {'use_sim_time': LaunchConfiguration('use_sim_time')}
-        ]
     )
 
     return LaunchDescription([

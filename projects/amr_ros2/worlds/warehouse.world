@@ -1,0 +1,246 @@
+<?xml version="1.0"?>
+<!--
+============================================================
+FILE        : warehouse.world
+PROJECT     : amr_ros2
+DESCRIPTION : Simulated warehouse environment for AMR testing.
+
+Contains:
+    - Outer walls (10m x 10m warehouse)
+    - 3 storage aisles (shelving rows)
+    - 2 pickup stations
+    - 1 dropoff zone
+    - Lighting
+============================================================
+-->
+<sdf version="1.6">
+    <world name="warehouse">
+
+        <!-- ===== PHYSICS ===== -->
+        <physics type="ode">
+            <real_time_update_rate>1000</real_time_update_rate>
+            <max_step_size>0.001</max_step_size>
+            <real_time_factor>1</real_time_factor>
+        </physics>
+
+        <!-- ===== LIGHTING ===== -->
+        <light name="sun" type="directional">
+            <cast_shadows>true</cast_shadows>
+            <pose>0 0 10 0 0 0</pose>
+            <diffuse>0.8 0.8 0.8 1</diffuse>
+            <specular>0.2 0.2 0.2 1</specular>
+            <direction>-0.5 0.1 -0.9</direction>
+        </light>
+
+        <!-- ===== GROUND PLANE ===== -->
+        <model name="ground_plane">
+            <static>true</static>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><plane><normal>0 0 1</normal></plane></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><plane><normal>0 0 1</normal><size>20 20</size></plane></geometry>
+                    <material>
+                        <ambient>0.8 0.8 0.8 1</ambient>
+                        <diffuse>0.8 0.8 0.8 1</diffuse>
+                    </material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== OUTER WALLS ===== -->
+        <!-- North wall -->
+        <model name="wall_north">
+            <static>true</static>
+            <pose>0 5 1 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>10 0.2 2</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>10 0.2 2</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- South wall -->
+        <model name="wall_south">
+            <static>true</static>
+            <pose>0 -5 1 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>10 0.2 2</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>10 0.2 2</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- East wall -->
+        <model name="wall_east">
+            <static>true</static>
+            <pose>5 0 1 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>0.2 10 2</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 10 2</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- West wall -->
+        <model name="wall_west">
+            <static>true</static>
+            <pose>-5 0 1 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>0.2 10 2</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>0.2 10 2</size></box></geometry>
+                    <material><ambient>0.6 0.6 0.6 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== STORAGE SHELVES (3 aisles) ===== -->
+        <!-- Shelf row A (left aisle) -->
+        <model name="shelf_A1">
+            <static>true</static>
+            <pose>-3 2 0.75 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                    <material><ambient>0.5 0.35 0.2 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="shelf_A2">
+            <static>true</static>
+            <pose>-3 -2 0.75 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                    <material><ambient>0.5 0.35 0.2 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- Shelf row B (center aisle) -->
+        <model name="shelf_B1">
+            <static>true</static>
+            <pose>0 2 0.75 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                    <material><ambient>0.5 0.35 0.2 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="shelf_B2">
+            <static>true</static>
+            <pose>0 -2 0.75 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                    <material><ambient>0.5 0.35 0.2 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- Shelf row C (right aisle) -->
+        <model name="shelf_C1">
+            <static>true</static>
+            <pose>3 2 0.75 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                    <material><ambient>0.5 0.35 0.2 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="shelf_C2">
+            <static>true</static>
+            <pose>3 -2 0.75 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>0.4 3 1.5</size></box></geometry>
+                    <material><ambient>0.5 0.35 0.2 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== PICKUP STATIONS ===== -->
+        <model name="pickup_station_1">
+            <static>true</static>
+            <pose>4 4 0.25 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>1 1 0.5</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>1 1 0.5</size></box></geometry>
+                    <material><ambient>0.1 0.7 0.1 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <model name="pickup_station_2">
+            <static>true</static>
+            <pose>4 -4 0.25 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>1 1 0.5</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>1 1 0.5</size></box></geometry>
+                    <material><ambient>0.1 0.7 0.1 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+        <!-- ===== DROPOFF ZONE ===== -->
+        <model name="dropoff_zone">
+            <static>true</static>
+            <pose>-4 0 0.1 0 0 0</pose>
+            <link name="link">
+                <collision name="collision">
+                    <geometry><box><size>1.5 1.5 0.2</size></box></geometry>
+                </collision>
+                <visual name="visual">
+                    <geometry><box><size>1.5 1.5 0.2</size></box></geometry>
+                    <material><ambient>0.7 0.1 0.1 1</ambient></material>
+                </visual>
+            </link>
+        </model>
+
+    </world>
+</sdf>

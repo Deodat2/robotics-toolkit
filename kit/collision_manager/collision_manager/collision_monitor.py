@@ -115,10 +115,17 @@ class CollisionMonitor(Node):
             robots = data.get('robots', {})
 
             for name, info in robots.items():
-                self.robot_positions[name] = (
-                    info.get('position_x', 0.0),
-                    info.get('position_y', 0.0)
-                )
+                # Only track robots that are NOT offline
+                state = info.get('state', 'offline')
+                if state != 'offline':
+                    self.robot_positions[name] = (
+                        info.get('position_x', 0.0),
+                        info.get('position_y', 0.0)
+                    )
+                elif name in self.robot_positions:
+                    # Remove offline robots from tracking
+                    del self.robot_positions[name]
+
         except json.JSONDecodeError:
             pass
 
@@ -128,9 +135,16 @@ class CollisionMonitor(Node):
     def _check_distances(self):
         """
         Computes distance between every pair of robots.
+        Only checks robots that have sent at least one status update.
         Issues alerts when robots get too close.
         """
-        robot_names = list(self.robot_positions.keys())
+
+        known_robots = {
+            name: pos for name, pos in self.robot_positions.items()
+            if name in self.active_robots   # NEW: track active robots
+        }
+
+        robot_names = list(known_robots.keys())
 
         if len(robot_names) < 2:
             return
