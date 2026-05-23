@@ -1,0 +1,22 @@
+# ============================================================
+# FILE        : collision_params.yaml
+# MODULE      : collision_manager (kit/)
+# DESCRIPTION : Collision prevention configuration.
+#
+# REUSABILITY:
+#   Tune distances based on your robot's physical size.
+#   Rule of thumb: warning = 3x robot radius,
+#                  critical = 1.5x robot radius
+# ============================================================
+
+collision_monitor:
+  ros__parameters:
+
+    # --- Safety distances ---
+    # AMR robot radius ≈ 0.22m
+    warning_distance:  1.5   # meters — slow down zone
+    critical_distance: 0.8   # meters — emergency stop zone
+
+    # --- Check rates ---
+    check_rate:  5.0          # Hz — how often to check distances
+    status_rate: 1.0          # Hz — status publish rate

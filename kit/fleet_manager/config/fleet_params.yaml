@@ -1,0 +1,26 @@
+# ============================================================
+# FILE        : fleet_params.yaml
+# MODULE      : fleet_manager (kit/)
+# DESCRIPTION : Fleet configuration.
+#
+# REUSABILITY:
+#   Add or remove robots by editing robot_names.
+#   No code changes needed.
+# ============================================================
+
+fleet_orchestrator:
+  ros__parameters:
+
+    # --- Fleet composition ---
+    # List all robot names here
+    # Each name must match the robot_name param in nav2_config
+    robot_names:
+      - "amr_001"
+      - "amr_002"
+
+    # --- Timeouts ---
+    heartbeat_timeout: 5.0    # seconds before marking robot offline
+
+    # --- Publishing rates ---
+    status_rate: 1.0          # Hz — fleet status update rate
+    assign_rate: 2.0          # Hz — mission assignment check rate
