@@ -40,8 +40,8 @@ class CollisionMonitor(Node):
     """
 
     # Risk levels
-    RISK_NONE     = "none"
-    RISK_WARNING  = "warning"
+    RISK_NONE = "none"
+    RISK_WARNING = "warning"
     RISK_CRITICAL = "critical"
 
     def __init__(self):
@@ -50,22 +50,22 @@ class CollisionMonitor(Node):
         # --------------------------------------------------
         # PARAMETERS
         # --------------------------------------------------
-        self.declare_parameter('warning_distance',  1.5)  # meters
+        self.declare_parameter('warning_distance', 1.5)  # meters
         self.declare_parameter('critical_distance', 0.8)  # meters
-        self.declare_parameter('check_rate',        5.0)  # Hz
-        self.declare_parameter('status_rate',       1.0)  # Hz
+        self.declare_parameter('check_rate', 5.0)  # Hz
+        self.declare_parameter('status_rate', 1.0)  # Hz
 
-        self.warn_dist    = self.get_parameter('warning_distance').value
-        self.crit_dist    = self.get_parameter('critical_distance').value
-        check_rate        = self.get_parameter('check_rate').value
-        status_rate       = self.get_parameter('status_rate').value
+        self.warn_dist = self.get_parameter('warning_distance').value
+        self.crit_dist = self.get_parameter('critical_distance').value
+        check_rate = self.get_parameter('check_rate').value
+        status_rate = self.get_parameter('status_rate').value
 
         # --------------------------------------------------
         # INTERNAL STATE
         # --------------------------------------------------
         self.robot_positions = {}   # {robot_name: (x, y)}
-        self.active_alerts   = {}   # {pair_key: alert_dict}
-        self.total_warnings  = 0
+        self.active_alerts = {}   # {pair_key: alert_dict}
+        self.total_warnings = 0
         self.total_criticals = 0
 
         # --------------------------------------------------
@@ -179,11 +179,11 @@ class CollisionMonitor(Node):
                 if risk != self.RISK_NONE:
                     pair_key = f'{name_a}_{name_b}'
                     alert = {
-                        "robot_a":    name_a,
-                        "robot_b":    name_b,
+                        "robot_a": name_a,
+                        "robot_b": name_b,
                         "distance_m": round(distance, 3),
                         "risk_level": risk,
-                        "timestamp":  time.time(),
+                        "timestamp": time.time(),
                     }
                     self.active_alerts[pair_key] = alert
 
@@ -199,8 +199,8 @@ class CollisionMonitor(Node):
                         )
                         # Publish emergency stop for both robots
                         stop = {
-                            "robots":  [name_a, name_b],
-                            "reason":  "collision_risk",
+                            "robots": [name_a, name_b],
+                            "reason": "collision_risk",
                             "distance": round(distance, 3),
                         }
                         stop_msg = String()
@@ -219,15 +219,15 @@ class CollisionMonitor(Node):
     def _publish_status(self):
         """Publishes collision monitor health and statistics."""
         status = {
-            "robots_tracked":   len(self.robot_positions),
-            "active_alerts":    len(self.active_alerts),
-            "total_warnings":   self.total_warnings,
-            "total_criticals":  self.total_criticals,
+            "robots_tracked": len(self.robot_positions),
+            "active_alerts": len(self.active_alerts),
+            "total_warnings": self.total_warnings,
+            "total_criticals": self.total_criticals,
             "alert_pairs": [
                 {
-                    "pair":     f"{a['robot_a']}↔{a['robot_b']}",
+                    "pair": f"{a['robot_a']}↔{a['robot_b']}",
                     "distance": a['distance_m'],
-                    "risk":     a['risk_level'],
+                    "risk": a['risk_level'],
                 }
                 for a in self.active_alerts.values()
             ]

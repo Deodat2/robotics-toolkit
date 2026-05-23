@@ -32,7 +32,6 @@ import math
 import rclpy
 from rclpy.node import Node
 from rclpy.action import ActionClient
-from rclpy.duration import Duration
 from geometry_msgs.msg import PoseStamped
 from nav2_msgs.action import NavigateToPose
 from std_msgs.msg import String
@@ -47,11 +46,11 @@ class MissionClient(Node):
     """
 
     # Navigation status constants — readable names
-    STATUS_IDLE      = "idle"
+    STATUS_IDLE = "idle"
     STATUS_NAVIGATING = "navigating"
-    STATUS_SUCCEEDED  = "succeeded"
-    STATUS_FAILED     = "failed"
-    STATUS_CANCELLED  = "cancelled"
+    STATUS_SUCCEEDED = "succeeded"
+    STATUS_FAILED = "failed"
+    STATUS_CANCELLED = "cancelled"
 
     def __init__(self):
         super().__init__('mission_client')
@@ -59,21 +58,21 @@ class MissionClient(Node):
         # --------------------------------------------------
         # PARAMETERS
         # --------------------------------------------------
-        self.declare_parameter('robot_name',   'amr_001')
-        self.declare_parameter('goal_timeout',  30.0)    # seconds
+        self.declare_parameter('robot_name', 'amr_001')
+        self.declare_parameter('goal_timeout', 30.0)    # seconds
 
-        self.robot_name   = self.get_parameter('robot_name').value
+        self.robot_name = self.get_parameter('robot_name').value
         self.goal_timeout = self.get_parameter('goal_timeout').value
 
         # --------------------------------------------------
         # INTERNAL STATE
         # --------------------------------------------------
-        self.status          = self.STATUS_IDLE
-        self.current_goal_x  = 0.0
-        self.current_goal_y  = 0.0
+        self.status = self.STATUS_IDLE
+        self.current_goal_x = 0.0
+        self.current_goal_y = 0.0
         self.goals_completed = 0
-        self.goals_failed    = 0
-        self._goal_handle    = None
+        self.goals_failed = 0
+        self._goal_handle = None
 
         # --------------------------------------------------
         # ACTION CLIENT: Nav2 NavigateToPose
@@ -150,7 +149,7 @@ class MissionClient(Node):
         )
         send_goal_future.add_done_callback(self._on_goal_response)
 
-        self.status         = self.STATUS_NAVIGATING
+        self.status = self.STATUS_NAVIGATING
         self.current_goal_x = x
         self.current_goal_y = y
         return True
@@ -173,7 +172,7 @@ class MissionClient(Node):
             f'x={x:.2f}, y={y:.2f}, yaw={yaw:.2f}'
         )
         self.go_to(x=x, y=y, yaw=yaw)
-    
+
     def cancel_goal(self):
         """Cancel the current navigation goal."""
         if self._goal_handle is not None:
@@ -238,7 +237,7 @@ class MissionClient(Node):
         """
         pose = PoseStamped()
         pose.header.frame_id = 'map'
-        pose.header.stamp    = self.get_clock().now().to_msg()
+        pose.header.stamp = self.get_clock().now().to_msg()
 
         pose.pose.position.x = x
         pose.pose.position.y = y
@@ -254,12 +253,12 @@ class MissionClient(Node):
     def _publish_status(self):
         """Publishes navigation status as JSON."""
         status = {
-            "robot_name":       self.robot_name,
-            "nav_status":       self.status,
-            "goal_x":           self.current_goal_x,
-            "goal_y":           self.current_goal_y,
-            "goals_completed":  self.goals_completed,
-            "goals_failed":     self.goals_failed,
+            "robot_name": self.robot_name,
+            "nav_status": self.status,
+            "goal_x": self.current_goal_x,
+            "goal_y": self.current_goal_y,
+            "goals_completed": self.goals_completed,
+            "goals_failed": self.goals_failed,
         }
         msg = String()
         msg.data = json.dumps(status)

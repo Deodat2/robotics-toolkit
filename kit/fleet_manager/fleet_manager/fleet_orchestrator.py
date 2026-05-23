@@ -32,54 +32,52 @@ REUSABILITY:
 
 import json
 import time
-from enum import Enum
-from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional
 import rclpy
+from enum import Enum
 from rclpy.node import Node
 from std_msgs.msg import String
-from geometry_msgs.msg import PoseStamped
-import math
+from typing import Dict, Optional
+from dataclasses import dataclass, field
 
 
 class RobotState(Enum):
     """Possible states for a robot in the fleet."""
-    IDLE        = "idle"        # available for missions
-    NAVIGATING  = "navigating"  # executing a mission
-    FAILED      = "failed"      # last mission failed
-    OFFLINE     = "offline"     # no heartbeat received
+    IDLE = "idle"        # available for missions
+    NAVIGATING = "navigating"  # executing a mission
+    FAILED = "failed"      # last mission failed
+    OFFLINE = "offline"     # no heartbeat received
 
 
 class MissionStatus(Enum):
     """Possible states for a mission."""
-    PENDING     = "pending"     # waiting to be assigned
-    ASSIGNED    = "assigned"    # assigned to a robot
-    COMPLETED   = "completed"   # successfully finished
-    FAILED      = "failed"      # robot failed to complete
+    PENDING = "pending"     # waiting to be assigned
+    ASSIGNED = "assigned"    # assigned to a robot
+    COMPLETED = "completed"   # successfully finished
+    FAILED = "failed"      # robot failed to complete
 
 
 @dataclass
 class Robot:
     """Represents a robot in the fleet."""
-    name:           str
-    state:          RobotState = RobotState.OFFLINE
+    name: str
+    state: RobotState = RobotState.OFFLINE
     current_mission: Optional[str] = None   # mission_id
-    position_x:     float = 0.0
-    position_y:     float = 0.0
+    position_x: float = 0.0
+    position_y: float = 0.0
     last_heartbeat: float = 0.0
-    missions_done:  int   = 0
-    missions_failed: int  = 0
+    missions_done: int = 0
+    missions_failed: int = 0
 
 
 @dataclass
 class Mission:
     """Represents a navigation mission."""
-    mission_id:  str
-    target_x:   float
-    target_y:   float
+    mission_id: str
+    target_x: float
+    target_y: float
     target_yaw: float = 0.0
-    priority:   int   = 2        # 1=high, 2=medium, 3=low
-    status:     MissionStatus = MissionStatus.PENDING
+    priority: int = 2        # 1=high, 2=medium, 3=low
+    status: MissionStatus = MissionStatus.PENDING
     assigned_to: Optional[str] = None
     created_at: float = field(default_factory=time.time)
     completed_at: Optional[float] = None
@@ -102,13 +100,13 @@ class FleetOrchestrator(Node):
             ['amr_001', 'amr_002']  # default 2-robot fleet
         )
         self.declare_parameter('heartbeat_timeout', 5.0)  # seconds
-        self.declare_parameter('status_rate',       1.0)  # Hz
-        self.declare_parameter('assign_rate',       2.0)  # Hz
+        self.declare_parameter('status_rate', 1.0)  # Hz
+        self.declare_parameter('assign_rate', 2.0)  # Hz
 
-        robot_names    = self.get_parameter('robot_names').value
+        robot_names = self.get_parameter('robot_names').value
         self.hb_timeout = self.get_parameter('heartbeat_timeout').value
-        status_rate    = self.get_parameter('status_rate').value
-        assign_rate    = self.get_parameter('assign_rate').value
+        status_rate = self.get_parameter('status_rate').value
+        assign_rate = self.get_parameter('assign_rate').value
 
         # --------------------------------------------------
         # FLEET STATE
@@ -191,11 +189,11 @@ class FleetOrchestrator(Node):
             data['mission_id'] = f'M{self.mission_counter:04d}'
 
         mission = Mission(
-            mission_id  = data['mission_id'],
-            target_x    = float(data.get('target_x',   0.0)),
-            target_y    = float(data.get('target_y',   0.0)),
-            target_yaw  = float(data.get('target_yaw', 0.0)),
-            priority    = int(data.get('priority',      2)),
+            mission_id=data['mission_id'],
+            target_x=float(data.get('target_x', 0.0)),
+            target_y=float(data.get('target_y', 0.0)),
+            target_yaw=float(data.get('target_yaw', 0.0)),
+            priority=int(data.get('priority', 2)),
         )
 
         self.missions[mission.mission_id] = mission
@@ -292,17 +290,17 @@ class FleetOrchestrator(Node):
 
     def _assign_mission_to_robot(self, mission: Mission, robot: Robot):
         """Assigns a specific mission to a specific robot."""
-        mission.status      = MissionStatus.ASSIGNED
+        mission.status = MissionStatus.ASSIGNED
         mission.assigned_to = robot.name
-        robot.state         = RobotState.NAVIGATING
+        robot.state = RobotState.NAVIGATING
         robot.current_mission = mission.mission_id
 
         assignment = {
-            "robot_name":  robot.name,
-            "mission_id":  mission.mission_id,
-            "target_x":    mission.target_x,
-            "target_y":    mission.target_y,
-            "target_yaw":  mission.target_yaw,
+            "robot_name": robot.name,
+            "mission_id": mission.mission_id,
+            "target_x": mission.target_x,
+            "target_y": mission.target_y,
+            "target_yaw": mission.target_yaw,
         }
 
         msg = String()
@@ -337,9 +335,9 @@ class FleetOrchestrator(Node):
                 f'Mission {mission_id} FAILED by {robot.name} — requeueing'
             )
             # Requeue failed mission with lower priority
-            mission.status      = MissionStatus.PENDING
+            mission.status = MissionStatus.PENDING
             mission.assigned_to = None
-            mission.priority    = min(mission.priority + 1, 3)
+            mission.priority = min(mission.priority + 1, 3)
 
         robot.current_mission = None
 
@@ -364,7 +362,7 @@ class FleetOrchestrator(Node):
     # ----------------------------------------------------------
     def _publish_status(self):
         """Publishes complete fleet status as JSON."""
-        pending_count   = sum(
+        pending_count = sum(
             1 for m in self.missions.values()
             if m.status == MissionStatus.PENDING
         )
@@ -377,19 +375,19 @@ class FleetOrchestrator(Node):
             "timestamp": time.time(),
             "robots": {
                 name: {
-                    "state":           robot.state.value,
+                    "state": robot.state.value,
                     "current_mission": robot.current_mission,
-                    "position_x":      round(robot.position_x, 2),
-                    "position_y":      round(robot.position_y, 2),
-                    "missions_done":   robot.missions_done,
+                    "position_x": round(robot.position_x, 2),
+                    "position_y": round(robot.position_y, 2),
+                    "missions_done": robot.missions_done,
                     "missions_failed": robot.missions_failed,
                 }
                 for name, robot in self.robots.items()
             },
             "queue": {
-                "pending":   pending_count,
+                "pending": pending_count,
                 "completed": completed_count,
-                "total":     len(self.missions),
+                "total": len(self.missions),
             }
         }
 

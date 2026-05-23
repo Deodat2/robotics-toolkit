@@ -58,19 +58,19 @@ class WaypointManager(Node):
         # Format: {"QR_CONTENT": (x, y, yaw)}
         # --------------------------------------------------
         self.waypoint_map = {
-            "ZONE_A":       (2.0,  1.0,  0.0),
-            "ZONE_B":       (2.0, -1.0,  0.0),
-            "ZONE_C":       (-2.0, 1.0,  3.14),
-            "HOME":         (0.0,  0.0,  0.0),
-            "PICKUP_01":    (3.0,  0.0,  0.0),
-            "PICKUP_02":    (3.0,  1.5,  0.0),
-            "DROPOFF_01":   (-3.0, 0.0,  3.14),
+            "ZONE_A": (2.0, 1.0, 0.0),
+            "ZONE_B": (2.0, -1.0, 0.0),
+            "ZONE_C": (-2.0, 1.0, 3.14),
+            "HOME": (0.0, 0.0, 0.0),
+            "PICKUP_01": (3.0, 0.0, 0.0),
+            "PICKUP_02": (3.0, 1.5, 0.0),
+            "DROPOFF_01": (-3.0, 0.0, 3.14),
         }
 
         # --------------------------------------------------
         # INTERNAL STATE
         # --------------------------------------------------
-        self.last_qr_seen     = None
+        self.last_qr_seen = None
         self.last_trigger_time = 0.0
 
         # --------------------------------------------------
@@ -135,7 +135,7 @@ class WaypointManager(Node):
                 goal = self._build_goal(x, y, yaw)
                 self.goal_pub.publish(goal)
 
-                self.last_qr_seen      = raw_content
+                self.last_qr_seen = raw_content
                 self.last_trigger_time = now
 
             else:
@@ -148,7 +148,7 @@ class WaypointManager(Node):
         """Builds a PoseStamped goal message from x, y, yaw."""
         goal = PoseStamped()
         goal.header.frame_id = 'map'
-        goal.header.stamp    = self.get_clock().now().to_msg()
+        goal.header.stamp = self.get_clock().now().to_msg()
 
         goal.pose.position.x = x
         goal.pose.position.y = y

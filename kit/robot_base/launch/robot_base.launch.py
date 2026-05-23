@@ -39,12 +39,9 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import (
     LaunchConfiguration,
     Command,                   # Run a shell command, capture output
-    PathJoinSubstitution,
 )
 from launch_ros.actions import Node
-from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
-from launch.substitutions import Command
 
 
 def generate_launch_description():
@@ -56,11 +53,11 @@ def generate_launch_description():
     # ----------------------------------------------------------
     # PACKAGE PATHS
     # ----------------------------------------------------------
-    pkg_robot_base   = get_package_share_directory('robot_base')
-    pkg_gazebo_ros   = get_package_share_directory('gazebo_ros')
+    pkg_robot_base = get_package_share_directory('robot_base')
+    pkg_gazebo_ros = get_package_share_directory('gazebo_ros')
 
     # Absolute paths to our config files
-    urdf_file   = os.path.join(pkg_robot_base, 'urdf',   'amr_robot.urdf.xacro')
+    urdf_file = os.path.join(pkg_robot_base, 'urdf', 'amr_robot.urdf.xacro')
     params_file = os.path.join(pkg_robot_base, 'config', 'robot_params.yaml')
 
     # ----------------------------------------------------------
@@ -118,7 +115,7 @@ def generate_launch_description():
             os.path.join(pkg_gazebo_ros, 'launch', 'gazebo.launch.py')
         ),
         launch_arguments={
-            'world':   '',       # empty world
+            'world': '',       # empty world
             'verbose': 'false',  # suppress Gazebo console spam
         }.items()
     )
@@ -139,9 +136,9 @@ def generate_launch_description():
                 arguments=[
                     '-topic', 'robot_description',
                     '-entity', LaunchConfiguration('robot_name'),
-                    '-x',     LaunchConfiguration('x_pose'),
-                    '-y',     LaunchConfiguration('y_pose'),
-                    '-z',     '0.1',   # slightly above ground to avoid clipping
+                    '-x', LaunchConfiguration('x_pose'),
+                    '-y', LaunchConfiguration('y_pose'),
+                    '-z', '0.1',   # slightly above ground to avoid clipping
                 ],
             )
         ]

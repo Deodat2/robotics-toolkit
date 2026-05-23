@@ -76,7 +76,8 @@ class RobotDescriptionPublisher(Node):
             durability=DurabilityPolicy.TRANSIENT_LOCAL  # "latching"
         )
 
-        self._publisher = self.create_publisher(String, 'robot_description', qos)
+        self._publisher = self.create_publisher(
+            String, 'robot_description', qos)
 
         # Publish once — the QoS latching keeps it available
         msg = String()

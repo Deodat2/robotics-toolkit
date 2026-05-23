@@ -50,26 +50,22 @@ class MapManager(Node):
         # --------------------------------------------------
         # PARAMETERS
         # --------------------------------------------------
-        self.declare_parameter(
-            'map_file_path',
-            os.path.expanduser(
-                '~/robotics/robotics-toolkit/kit/slam_module/maps/warehouse_map'
-            )
-        )
+        self.declare_parameter('map_file_path', os.path.expanduser(
+            '~/robotics/robotics-toolkit/kit/slam_module/maps/warehouse_map'))
         self.declare_parameter('status_rate', 1.0)   # Hz
 
         self.map_file_path = self.get_parameter('map_file_path').value
-        status_rate        = self.get_parameter('status_rate').value
+        status_rate = self.get_parameter('status_rate').value
 
         # --------------------------------------------------
         # INTERNAL STATE
         # --------------------------------------------------
-        self.map_width       = 0
-        self.map_height      = 0
-        self.map_resolution  = 0.0
-        self.explored_cells  = 0    # cells with known value (not -1)
-        self.total_cells     = 0
-        self.map_received    = False
+        self.map_width = 0
+        self.map_height = 0
+        self.map_resolution = 0.0
+        self.explored_cells = 0    # cells with known value (not -1)
+        self.total_cells = 0
+        self.map_received = False
 
         # --------------------------------------------------
         # SUBSCRIBER: /map
@@ -126,11 +122,11 @@ class MapManager(Node):
            0  = free space
           100 = occupied (wall/obstacle)
         """
-        self.map_received  = True
-        self.map_width     = msg.info.width
-        self.map_height    = msg.info.height
+        self.map_received = True
+        self.map_width = msg.info.width
+        self.map_height = msg.info.height
         self.map_resolution = msg.info.resolution
-        self.total_cells   = self.map_width * self.map_height
+        self.total_cells = self.map_width * self.map_height
 
         # Count cells that have been explored (value != -1)
         self.explored_cells = sum(
@@ -188,13 +184,13 @@ class MapManager(Node):
             explored_pct = 0.0
 
         status = {
-            "map_received":   self.map_received,
-            "map_width":      self.map_width,
-            "map_height":     self.map_height,
-            "resolution_m":   self.map_resolution,
-            "explored_pct":   round(explored_pct, 1),
+            "map_received": self.map_received,
+            "map_width": self.map_width,
+            "map_height": self.map_height,
+            "resolution_m": self.map_resolution,
+            "explored_pct": round(explored_pct, 1),
             "explored_cells": self.explored_cells,
-            "total_cells":    self.total_cells,
+            "total_cells": self.total_cells,
         }
 
         msg = String()

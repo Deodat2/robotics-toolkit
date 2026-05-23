@@ -45,17 +45,17 @@ class CameraNode(Node):
         # --------------------------------------------------
         # PARAMETERS
         # --------------------------------------------------
-        self.declare_parameter('input_topic',   '/camera/image_raw')
-        self.declare_parameter('output_width',   640)
-        self.declare_parameter('output_height',  480)
-        self.declare_parameter('publish_debug',  True)
-        self.declare_parameter('status_rate',    1.0)
+        self.declare_parameter('input_topic', '/camera/image_raw')
+        self.declare_parameter('output_width', 640)
+        self.declare_parameter('output_height', 480)
+        self.declare_parameter('publish_debug', True)
+        self.declare_parameter('status_rate', 1.0)
 
-        input_topic    = self.get_parameter('input_topic').value
-        self.out_w     = self.get_parameter('output_width').value
-        self.out_h     = self.get_parameter('output_height').value
+        input_topic = self.get_parameter('input_topic').value
+        self.out_w = self.get_parameter('output_width').value
+        self.out_h = self.get_parameter('output_height').value
         self.pub_debug = self.get_parameter('publish_debug').value
-        status_rate    = self.get_parameter('status_rate').value
+        status_rate = self.get_parameter('status_rate').value
 
         # --------------------------------------------------
         # PUBLISHERS
@@ -117,9 +117,9 @@ class CameraNode(Node):
         """Publishes camera health status as JSON."""
         status = {
             "frames_received": self.converter.frames_received,
-            "frames_failed":   self.converter.frames_failed,
-            "last_shape":      str(self.converter.last_frame_shape),
-            "output_size":     f"{self.out_w}x{self.out_h}",
+            "frames_failed": self.converter.frames_failed,
+            "last_shape": str(self.converter.last_frame_shape),
+            "output_size": f"{self.out_w}x{self.out_h}",
         }
         msg = String()
         msg.data = json.dumps(status)

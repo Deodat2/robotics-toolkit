@@ -59,31 +59,31 @@ class YoloDetector(Node):
         self.declare_parameter(
             'input_topic', '/vision/image_preprocessed'
         )
-        self.declare_parameter('model_name',       'yolov8n.pt')
+        self.declare_parameter('model_name', 'yolov8n.pt')
         self.declare_parameter('confidence_threshold', 0.5)
-        self.declare_parameter('iou_threshold',        0.45)
-        self.declare_parameter('max_detections',       20)
-        self.declare_parameter('publish_debug',        True)
-        self.declare_parameter('process_every_n',      3)
-        self.declare_parameter('status_rate',          1.0)
+        self.declare_parameter('iou_threshold', 0.45)
+        self.declare_parameter('max_detections', 20)
+        self.declare_parameter('publish_debug', True)
+        self.declare_parameter('process_every_n', 3)
+        self.declare_parameter('status_rate', 1.0)
 
-        input_topic    = self.get_parameter('input_topic').value
-        model_name     = self.get_parameter('model_name').value
-        self.conf_thr  = self.get_parameter('confidence_threshold').value
-        self.iou_thr   = self.get_parameter('iou_threshold').value
-        self.max_det   = self.get_parameter('max_detections').value
+        input_topic = self.get_parameter('input_topic').value
+        model_name = self.get_parameter('model_name').value
+        self.conf_thr = self.get_parameter('confidence_threshold').value
+        self.iou_thr = self.get_parameter('iou_threshold').value
+        self.max_det = self.get_parameter('max_detections').value
         self.pub_debug = self.get_parameter('publish_debug').value
-        self.every_n   = self.get_parameter('process_every_n').value
-        status_rate    = self.get_parameter('status_rate').value
+        self.every_n = self.get_parameter('process_every_n').value
+        status_rate = self.get_parameter('status_rate').value
 
         # --------------------------------------------------
         # INTERNAL STATE
         # --------------------------------------------------
-        self.frame_count       = 0
-        self.total_detections  = 0
-        self.last_detections   = []
-        self.inference_times   = []   # track FPS
-        self.model             = None
+        self.frame_count = 0
+        self.total_detections = 0
+        self.last_detections = []
+        self.inference_times = []   # track FPS
+        self.model = None
 
         # --------------------------------------------------
         # LOAD YOLO MODEL
@@ -254,29 +254,29 @@ class YoloDetector(Node):
                     x1, y1, x2, y2 = box.xyxy[0].tolist()
 
                     # Detection metadata
-                    confidence  = float(box.conf[0])
-                    class_id    = int(box.cls[0])
-                    class_name  = result.names[class_id]
+                    confidence = float(box.conf[0])
+                    class_id = int(box.cls[0])
+                    class_name = result.names[class_id]
 
                     # Center and size
                     center_x = (x1 + x2) / 2
                     center_y = (y1 + y2) / 2
-                    width    = x2 - x1
-                    height   = y2 - y1
+                    width = x2 - x1
+                    height = y2 - y1
 
                     detection = {
-                        "class_id":   class_id,
+                        "class_id": class_id,
                         "class_name": class_name,
                         "confidence": round(confidence, 3),
                         "bbox": {
                             "x1": round(x1), "y1": round(y1),
                             "x2": round(x2), "y2": round(y2),
                         },
-                        "center_x":   round(center_x),
-                        "center_y":   round(center_y),
-                        "width_px":   round(width),
-                        "height_px":  round(height),
-                        "timestamp":  time.time(),
+                        "center_x": round(center_x),
+                        "center_y": round(center_y),
+                        "width_px": round(width),
+                        "height_px": round(height),
+                        "timestamp": time.time(),
                     }
                     detections.append(detection)
 
@@ -306,9 +306,9 @@ class YoloDetector(Node):
         ]
 
         for det in detections:
-            bbox   = det['bbox']
-            label  = f"{det['class_name']} {det['confidence']:.0%}"
-            color  = colors[det['class_id'] % len(colors)]
+            bbox = det['bbox']
+            label = f"{det['class_name']} {det['confidence']:.0%}"
+            color = colors[det['class_id'] % len(colors)]
 
             # Draw bounding box
             cv2.rectangle(
@@ -352,12 +352,12 @@ class YoloDetector(Node):
         fps = 1000.0 / max(avg_ms, 1)
 
         status = {
-            "model_loaded":       self.model is not None,
-            "frames_processed":   self.frame_count,
-            "total_detections":   self.total_detections,
-            "current_count":      len(self.last_detections),
-            "avg_inference_ms":   round(avg_ms, 1),
-            "estimated_fps":      round(fps, 1),
+            "model_loaded": self.model is not None,
+            "frames_processed": self.frame_count,
+            "total_detections": self.total_detections,
+            "current_count": len(self.last_detections),
+            "avg_inference_ms": round(avg_ms, 1),
+            "estimated_fps": round(fps, 1),
             "current_objects": [
                 d['class_name'] for d in self.last_detections
             ],

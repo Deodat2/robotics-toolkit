@@ -59,14 +59,14 @@ class ImageConverter:
             encoding    : OpenCV color encoding ('bgr8' or 'rgb8')
             queue_size  : subscriber queue depth (1 = always latest frame)
         """
-        self._node     = node
+        self._node = node
         self._callback = callback
         self._encoding = encoding
-        self._bridge   = CvBridge()
+        self._bridge = CvBridge()
 
         # Track stats for diagnostics
-        self.frames_received  = 0
-        self.frames_failed    = 0
+        self.frames_received = 0
+        self.frames_failed = 0
         self.last_frame_shape = None
 
         # Subscribe to the image topic

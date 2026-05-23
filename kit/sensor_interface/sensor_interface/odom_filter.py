@@ -40,10 +40,10 @@ class OdomFilter(Node):
         # --------------------------------------------------
         # PARAMETERS
         # --------------------------------------------------
-        self.declare_parameter('input_topic',  '/odom')
+        self.declare_parameter('input_topic', '/odom')
         self.declare_parameter('output_topic', '/sensors/odom/filtered')
 
-        input_topic  = self.get_parameter('input_topic').value
+        input_topic = self.get_parameter('input_topic').value
         output_topic = self.get_parameter('output_topic').value
 
         # --------------------------------------------------
@@ -96,7 +96,7 @@ class OdomFilter(Node):
         )
 
         # --- Validate twist (velocity) ---
-        clean_msg.twist.twist.linear.x  = self._safe(
+        clean_msg.twist.twist.linear.x = self._safe(
             msg.twist.twist.linear.x
         )
         clean_msg.twist.twist.angular.z = self._safe(
@@ -104,7 +104,7 @@ class OdomFilter(Node):
         )
 
         # --- Pass covariance through (already float arrays) ---
-        clean_msg.pose.covariance  = msg.pose.covariance
+        clean_msg.pose.covariance = msg.pose.covariance
         clean_msg.twist.covariance = msg.twist.covariance
 
         self.odom_pub.publish(clean_msg)

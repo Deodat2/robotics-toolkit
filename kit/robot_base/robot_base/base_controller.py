@@ -47,29 +47,29 @@ class BaseController(Node):
         # --------------------------------------------------
         # PARAMETERS (all from robot_params.yaml)
         # --------------------------------------------------
-        self.declare_parameter('robot_name',           'amr_001')
-        self.declare_parameter('max_linear_velocity',   0.5)
-        self.declare_parameter('max_angular_velocity',  1.0)
-        self.declare_parameter('cmd_vel_topic',        '/cmd_vel')
-        self.declare_parameter('odom_topic',           '/odom')
-        self.declare_parameter('status_publish_rate',   1.0)
+        self.declare_parameter('robot_name', 'amr_001')
+        self.declare_parameter('max_linear_velocity', 0.5)
+        self.declare_parameter('max_angular_velocity', 1.0)
+        self.declare_parameter('cmd_vel_topic', '/cmd_vel')
+        self.declare_parameter('odom_topic', '/odom')
+        self.declare_parameter('status_publish_rate', 1.0)
 
         # Read parameter values into local variables
-        self.robot_name    = self.get_parameter('robot_name').value
-        self.max_linear    = self.get_parameter('max_linear_velocity').value
-        self.max_angular   = self.get_parameter('max_angular_velocity').value
-        cmd_vel_topic      = self.get_parameter('cmd_vel_topic').value
-        odom_topic         = self.get_parameter('odom_topic').value
-        status_rate        = self.get_parameter('status_publish_rate').value
+        self.robot_name = self.get_parameter('robot_name').value
+        self.max_linear = self.get_parameter('max_linear_velocity').value
+        self.max_angular = self.get_parameter('max_angular_velocity').value
+        cmd_vel_topic = self.get_parameter('cmd_vel_topic').value
+        odom_topic = self.get_parameter('odom_topic').value
+        status_rate = self.get_parameter('status_publish_rate').value
 
         # --------------------------------------------------
         # INTERNAL STATE
         # --------------------------------------------------
-        self.current_linear_vel  = 0.0   # m/s
+        self.current_linear_vel = 0.0   # m/s
         self.current_angular_vel = 0.0   # rad/s
-        self.position_x          = 0.0   # meters from start
-        self.position_y          = 0.0
-        self.total_commands      = 0     # counter for diagnostics
+        self.position_x = 0.0   # meters from start
+        self.position_y = 0.0
+        self.total_commands = 0     # counter for diagnostics
 
         # --------------------------------------------------
         # SUBSCRIBERS
@@ -127,14 +127,16 @@ class BaseController(Node):
         self.total_commands += 1
 
         # math.clamp equivalent: keep value within [−max, +max]
-        raw_linear  = msg.linear.x
+        raw_linear = msg.linear.x
         raw_angular = msg.angular.z
 
         # Clamp to safety limits
-        clamped_linear  = max(-self.max_linear,  min(self.max_linear,  raw_linear))
-        clamped_angular = max(-self.max_angular, min(self.max_angular, raw_angular))
+        clamped_linear = max(-self.max_linear,
+                             min(self.max_linear, raw_linear))
+        clamped_angular = max(-self.max_angular,
+                              min(self.max_angular, raw_angular))
 
-        self.current_linear_vel  = clamped_linear
+        self.current_linear_vel = clamped_linear
         self.current_angular_vel = clamped_angular
 
         # Warn if a command was clamped (useful for debugging)
@@ -167,12 +169,12 @@ class BaseController(Node):
         logging system) to parse the data easily.
         """
         status = {
-            "robot_name":   self.robot_name,
-            "linear_vel":   round(self.current_linear_vel,  3),
-            "angular_vel":  round(self.current_angular_vel, 3),
-            "position_x":   round(self.position_x, 3),
-            "position_y":   round(self.position_y, 3),
-            "total_cmds":   self.total_commands,
+            "robot_name": self.robot_name,
+            "linear_vel": round(self.current_linear_vel, 3),
+            "angular_vel": round(self.current_angular_vel, 3),
+            "position_x": round(self.position_x, 3),
+            "position_y": round(self.position_y, 3),
+            "total_cmds": self.total_commands,
         }
 
         msg = String()

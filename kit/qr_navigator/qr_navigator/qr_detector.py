@@ -54,24 +54,24 @@ class QRDetector(Node):
         self.declare_parameter(
             'input_topic', '/vision/image_preprocessed'
         )
-        self.declare_parameter('qr_real_size_m',   0.15)  # QR physical size
+        self.declare_parameter('qr_real_size_m', 0.15)  # QR physical size
         self.declare_parameter('focal_length_px', 554.0)  # camera focal length
-        self.declare_parameter('min_confidence',    0.5)  # detection threshold
-        self.declare_parameter('publish_debug',    True)
-        self.declare_parameter('status_rate',       1.0)
+        self.declare_parameter('min_confidence', 0.5)  # detection threshold
+        self.declare_parameter('publish_debug', True)
+        self.declare_parameter('status_rate', 1.0)
 
-        input_topic       = self.get_parameter('input_topic').value
+        input_topic = self.get_parameter('input_topic').value
         self.qr_real_size = self.get_parameter('qr_real_size_m').value
         self.focal_length = self.get_parameter('focal_length_px').value
-        self.pub_debug    = self.get_parameter('publish_debug').value
-        status_rate       = self.get_parameter('status_rate').value
+        self.pub_debug = self.get_parameter('publish_debug').value
+        status_rate = self.get_parameter('status_rate').value
 
         # --------------------------------------------------
         # INTERNAL STATE
         # --------------------------------------------------
-        self.frames_processed  = 0
-        self.total_detections  = 0
-        self.last_detections   = []   # list of last detected QR codes
+        self.frames_processed = 0
+        self.total_detections = 0
+        self.last_detections = []   # list of last detected QR codes
         self.last_detection_time = 0.0
 
         # --------------------------------------------------
@@ -161,18 +161,18 @@ class QRDetector(Node):
                 distance_m = -1.0   # unknown
 
             # Calculate center of QR code in image
-            center_x = qr.rect.left + qr.rect.width  // 2
-            center_y = qr.rect.top  + qr.rect.height // 2
+            center_x = qr.rect.left + qr.rect.width // 2
+            center_y = qr.rect.top + qr.rect.height // 2
 
             detection = {
-                "content":    content,
-                "raw":        raw_content,
-                "center_x":   center_x,
-                "center_y":   center_y,
-                "width_px":   qr.rect.width,
-                "height_px":  qr.rect.height,
+                "content": content,
+                "raw": raw_content,
+                "center_x": center_x,
+                "center_y": center_y,
+                "width_px": qr.rect.width,
+                "height_px": qr.rect.height,
                 "distance_m": round(distance_m, 3),
-                "timestamp":  time.time(),
+                "timestamp": time.time(),
             }
             detections.append(detection)
             self.total_detections += 1
@@ -257,9 +257,9 @@ class QRDetector(Node):
             if self.last_detection_time > 0 else -1
         )
         status = {
-            "frames_processed":    self.frames_processed,
-            "total_detections":    self.total_detections,
-            "current_detections":  len(self.last_detections),
+            "frames_processed": self.frames_processed,
+            "total_detections": self.total_detections,
+            "current_detections": len(self.last_detections),
             "last_detection_ago_s": round(time_since_last, 1),
             "last_qr_content": (
                 self.last_detections[0]["raw"]
